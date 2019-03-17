@@ -73,6 +73,8 @@ def record(command, writer, env=os.environ, rec_stdin=False, time_offset=0, noti
             else:
                 pause_time = time.time()
                 _notify('Paused recording')
+        elif data == b'\x02':  # ctrl+b
+            writer.write_break(time.time() - start_time)
         else:
             _write_master(data)
 
