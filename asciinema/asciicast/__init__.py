@@ -41,6 +41,10 @@ def open_url(url):
         url = "https://ipfs.io/ipfs/%s" % url[7:]
     elif url.startswith("dweb:/ipfs/"):
         url = "https://ipfs.io/%s" % url[5:]
+    
+    if url.startswith ("sia://"):
+        # TODO Allow to configure skynet-portal
+        url = "https://siasky.net/%s" % url[6:]
 
     if url.startswith("http:") or url.startswith("https:"):
         req = Request(url)

@@ -82,12 +82,12 @@ For help on a specific command run:
     parser_play = subparsers.add_parser('play', help='Replay terminal session')
     parser_play.add_argument('-i', '--idle-time-limit', help='limit idle time during playback to given number of seconds', type=positive_float, default=maybe_str(cfg.play_idle_time_limit))
     parser_play.add_argument('-s', '--speed', help='playback speedup (can be fractional)', type=positive_float, default=cfg.play_speed)
-    parser_play.add_argument('filename', help='local path, http/ipfs URL or "-" (read from stdin)')
+    parser_play.add_argument('filename', help='local path, http/ipfs/sia URL or "-" (read from stdin)')
     parser_play.set_defaults(cmd=PlayCommand)
 
     # create the parser for the "cat" command
     parser_cat = subparsers.add_parser('cat', help='Print full output of terminal session')
-    parser_cat.add_argument('filename', help='local path, http/ipfs URL or "-" (read from stdin)')
+    parser_cat.add_argument('filename', help='local path, http/ipfs/sia URL or "-" (read from stdin)')
     parser_cat.set_defaults(cmd=CatCommand)
 
     # create the parser for the "upload" command
