@@ -21,6 +21,7 @@ class Api:
         self.user = user
         self.install_id = install_id
         self.http_adapter = http_adapter if http_adapter is not None else URLLibHttpAdapter()
+        self.isSkynet = (urlparse(self.url).scheme[-7:] == '+skynet')
 
     def hostname(self):
         return urlparse(self.url).hostname
@@ -29,15 +30,15 @@ class Api:
         return "{}/connect/{}".format(self.url, self.install_id)
 
     def upload_url(self):
-        url = urlparse(self.url)
-        
-        if url.scheme[-7:] == '+skynet':
+        if self.isSkynet:
+            url = urlparse(self.url)
+            
             return '%s://%s/skynet/skyfile/%s' % (url.scheme[:-7], url.netloc, uuid4().hex)
 
         return "{}/api/asciicasts".format(self.url)
 
     def upload_field(self):
-        if urlparse(self.url).scheme[-7:] == '+skynet':
+        if self.isSkynet:
             return 'file'
 
         return 'asciicast'
@@ -60,9 +61,9 @@ class Api:
 
         if (headers.get('content-type') or '')[0:16] == 'application/json':
             result = json.loads(body)
-            url = urlparse(self.url)
             
-            if url.scheme[-7:] == '+skynet':
+            if self.isSkynet:
+                url = urlparse(self.url)
                 result['url'] = '%s://%s/%s' % (url.scheme[:-7], url.netloc, result['skylink'])
         else:
             result = {'url': body}
