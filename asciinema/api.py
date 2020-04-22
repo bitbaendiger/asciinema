@@ -1,6 +1,8 @@
 import platform
 import re
 import json
+
+from uuid import uuid4
 from urllib.parse import urlparse
 
 from asciinema import __version__
@@ -27,14 +29,25 @@ class Api:
         return "{}/connect/{}".format(self.url, self.install_id)
 
     def upload_url(self):
+        url = urlparse(self.url)
+        
+        if url.scheme[-7:] == '+skynet':
+            return '%s://%s/skynet/skyfile/%s' % (url.scheme[:-7], url.netloc, uuid4().hex)
+
         return "{}/api/asciicasts".format(self.url)
+
+    def upload_field(self):
+        if urlparse(self.url).scheme[-7:] == '+skynet':
+            return 'file'
+
+        return 'asciicast'
 
     def upload_asciicast(self, path):
         with open(path, 'rb') as f:
             try:
                 status, headers, body = self.http_adapter.post(
                     self.upload_url(),
-                    files={"asciicast": ("ascii.cast", f)},
+                    files={self.upload_field(): ("ascii.cast", f)},
                     headers=self._headers(),
                     username=self.user,
                     password=self.install_id
@@ -47,6 +60,10 @@ class Api:
 
         if (headers.get('content-type') or '')[0:16] == 'application/json':
             result = json.loads(body)
+            url = urlparse(self.url)
+            
+            if url.scheme[-7:] == '+skynet':
+                result['url'] = '%s://%s/%s' % (url.scheme[:-7], url.netloc, result['skylink'])
         else:
             result = {'url': body}
 
